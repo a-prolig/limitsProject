@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: productClient
+  datasource:
+    url: jdbc:postgresql://localhost:5432/java
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+  flyway:
+    schemas: public
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+server:
+  port:
+    8082
+
+baseLimit: 10000.00
+
+
+
+
