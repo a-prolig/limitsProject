@@ -15,7 +15,6 @@ import java.util.Objects;
 @Service
 @Slf4j
 public class UserAccountServiceImpl implements UserAccountService {
-
     @Value("${baseLimit}")
     private double baseLimit;
     private final UserAccountRepository repository;
@@ -46,9 +45,11 @@ public class UserAccountServiceImpl implements UserAccountService {
     public UserAccount getAccountInfoByUserId(Integer userId) {
         UserAccount userAccount = new UserAccount();
         if (userId > 100) {
-            log.info(String.format("Создание несуществующего пользователя userId=%s",  userId));
+            log.info(String.format("Сохранение нового пользователя userId=%s",  userId));
             userAccount.setUserId(userId);
+            userAccount.setAccountNumber(String.format("100%s", userId));
             userAccount.setCustomLimit(BigDecimal.valueOf(baseLimit));
+            userAccount.setBalance(BigDecimal.valueOf(0));
             save(userAccount);
         } else {
             userAccount = repository.getAccountInfoByUserId(userId);
@@ -62,11 +63,14 @@ public class UserAccountServiceImpl implements UserAccountService {
         BigDecimal balance = userAccount.getBalance();
         String accountNumber = userAccount.getAccountNumber();
         BigDecimal limit = userAccount.getCustomLimit();
-        if (Objects.isNull(balance) || StringUtils.isEmpty(balance) || balance.compareTo(amount) < 0) {
+        if (Objects.isNull(balance) || balance.compareTo(amount) < 0) {
             throw new RuntimeException(String.format("Product accountNumber=%s has less balance then current amount",  accountNumber));
         }
-        BigDecimal newLimit = limit.subtract(amount);
+        if (limit.intValue() == 0 || limit.compareTo(amount) < 0) {
+            throw new RuntimeException(String.format("Product accountNumber=%s has less limit then current amount",  accountNumber));
+        }
         BigDecimal newBalance = balance.subtract(amount);
+        BigDecimal newLimit = limit.subtract(amount);
         userAccount.setCustomLimit(newLimit);
         userAccount.setBalance(newBalance);
         return save(userAccount);

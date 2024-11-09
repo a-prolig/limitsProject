@@ -34,7 +34,7 @@ public class UserAccountController {
 
     @PostMapping("/executePayment")
     public UserAccount executePayment(@RequestBody RequestDto dto) {
-        return userAccountService.updateUserLimit(dto.id, dto.amount);
+        return userAccountService.updateUserLimit(dto.userId, dto.amount);
     }
 
 }
